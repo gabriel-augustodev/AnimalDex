@@ -1,46 +1,50 @@
 import 'package:flutter/material.dart';
 import '../../core/models/animal_model.dart';
-import '../animal_detail/animal_detail_page.dart';
 
 class AnimalCard extends StatelessWidget {
   final AnimalModel animal;
+  final VoidCallback onTap;
 
-  const AnimalCard({super.key, required this.animal});
+  const AnimalCard({
+    super.key,
+    required this.animal,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(12),
-      child: ListTile(
-        leading: animal.imageUrl.isNotEmpty
-            ? Image.network(
+    final scheme = Theme.of(context).colorScheme;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: scheme.primary.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: scheme.primary.withOpacity(0.2),
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Image.network(
                 animal.imageUrl,
-                width: 60,
-                fit: BoxFit.cover,
-              )
-            : const Icon(Icons.pets),
-        title: Text(
-          animal.commonName,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        subtitle: Text(
-          animal.scientificName,
-          style: const TextStyle(
-            fontStyle: FontStyle.italic,
-          ),
-        ),
-        onTap: () {
-          /// 👉 É AQUI que entra o Navigator.push
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => AnimalDetailPage(animal: animal),
+                fit: BoxFit.contain,
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 6),
+            Text(
+              "#${animal.id.toString().padLeft(3, '0')}",
+              style: TextStyle(
+                color: scheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }

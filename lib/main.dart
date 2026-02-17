@@ -17,9 +17,12 @@ class AnimalDexApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ScanController()),
         ChangeNotifierProvider(
-            create: (_) => PokedexController()..loadPokedex()),
+          create: (_) => ScanController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => PokedexController(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

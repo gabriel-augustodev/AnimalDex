@@ -1,27 +1,33 @@
 import 'package:flutter/material.dart';
+import '../../core/data/pokedex_base.dart';
+import '../../core/models/pokedex_entry.dart';
 import '../../core/models/animal_model.dart';
-import '../../core/storage/pokedex_storage.dart';
 
 class PokedexController extends ChangeNotifier {
-  final PokedexStorage _storage = PokedexStorage();
+  late List<PokedexEntry> _entries;
 
-  List<AnimalModel> animals = [];
+  List<PokedexEntry> get entries => _entries;
 
-  Future<void> loadPokedex() async {
-    animals = await _storage.getAnimals();
-    notifyListeners();
+  PokedexController() {
+    _entries = PokedexBase.initialEntries();
   }
 
-  Future<void> addAnimal(AnimalModel animal) async {
-    final exists = animals.any((a) => a.id == animal.id);
-    if (!exists) {
-      animals.add(animal);
-      await _storage.saveAnimals(animals);
+  void unlockAnimal(AnimalModel scannedAnimal) {
+    final index = _entries.indexWhere(
+      (entry) =>
+          entry.animal.commonName.toLowerCase() ==
+          scannedAnimal.commonName.toLowerCase(),
+    );
+
+    if (index != -1) {
+      _entries[index] = PokedexEntry(
+        pokedexNumber: _entries[index].pokedexNumber,
+        rarity: _entries[index].rarity,
+        isDiscovered: true,
+        animal: scannedAnimal,
+      );
+
       notifyListeners();
     }
   }
-
-  int get discovered => animals.length;
-
-  int totalAnimals = 150; // Pode ajustar depois
 }

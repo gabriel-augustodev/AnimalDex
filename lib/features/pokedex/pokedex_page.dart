@@ -38,6 +38,10 @@ class PokedexPage extends StatelessWidget {
               decoration: BoxDecoration(
                 color: entry.isDiscovered ? Colors.white : Colors.grey.shade300,
                 borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: _rarityColor(entry.rarity),
+                  width: 3,
+                ),
               ),
               child: Center(
                 child: entry.isDiscovered
@@ -57,5 +61,20 @@ class PokedexPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Color _rarityColor(String rarity) {
+    switch (rarity) {
+      case "comum":
+        return Colors.green;
+      case "incomum":
+        return Colors.blue;
+      case "raro":
+        return Colors.purple;
+      case "lendario":
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
   }
 }

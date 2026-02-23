@@ -43,18 +43,39 @@ class PokedexPage extends StatelessWidget {
                   width: 3,
                 ),
               ),
-              child: Center(
-                child: entry.isDiscovered
-                    ? Image.network(
-                        entry.animal.imageUrl,
-                        fit: BoxFit.cover,
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (entry.isDiscovered && entry.animal.imageUrl.isNotEmpty)
+                      Expanded(
+                        child: Image.network(
+                          entry.animal.imageUrl,
+                          fit: BoxFit.cover,
+                        ),
                       )
-                    : Text(
+                    else
+                      Text(
                         "#${entry.pokedexNumber.toString().padLeft(3, '0')}",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                    const SizedBox(height: 6),
+                    Text(
+                      entry.animal.commonName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: entry.isDiscovered
+                            ? Colors.black
+                            : Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           );

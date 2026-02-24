@@ -23,9 +23,12 @@ class AnimalModel {
     return AnimalModel(
       id: json['id'],
       scientificName: json['name'] ?? 'Nome científico desconhecido',
-      commonName: json['matched_term'] ??
-          json['preferred_common_name'] ??
+
+      // 👇 ORDEM CORRETA
+      commonName: json['preferred_common_name'] ??
+          json['name'] ?? // fallback científico
           'Nome popular desconhecido',
+
       imageUrl: json['default_photo'] != null
           ? json['default_photo']['medium_url']
           : '',

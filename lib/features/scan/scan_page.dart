@@ -1,86 +1,69 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/features/scan/scan_controller.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_mlkit_image_labeling/google_mlkit_image_labeling.dart';
 
-class ScanPage extends StatefulWidget {
+import 'package:provider/provider.dart';
+
+class ScanPage extends StatelessWidget {
   const ScanPage({super.key});
 
   @override
-  State<ScanPage> createState() => _ScanPageState();
-}
-
-class _ScanPageState extends State<ScanPage> {
-  final ImagePicker _picker = ImagePicker();
-  File? _image;
-  String _result = "";
-
-  Future<void> _pickImage(ImageSource source) async {
-    final picked = await _picker.pickImage(source: source);
-
-    if (picked == null) return;
-
-    final file = File(picked.path);
-
-    setState(() {
-      _image = file;
-    });
-
-    await _analyzeImage(file);
-  }
-
-  Future<void> _analyzeImage(File file) async {
-    final inputImage = InputImage.fromFile(file);
-    final labeler = ImageLabeler(options: ImageLabelerOptions());
-
-    final labels = await labeler.processImage(inputImage);
-
-    if (labels.isNotEmpty) {
-      setState(() {
-        _result = labels.first.label;
-      });
-    } else {
-      setState(() {
-        _result = "Nenhum animal detectado";
-      });
-    }
-
-    labeler.close();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final controller = context.watch<ScanController>();
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Escanear"),
-        backgroundColor: Colors.green,
+        title: const Text("Escanear Animal"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (_image != null)
-              Expanded(
-                child: Image.file(_image!),
-              ),
-            const SizedBox(height: 20),
-            if (_result.isNotEmpty)
-              Text(
-                "Detectado: $_result",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+            if (controller.isLoading) const CircularProgressIndicator(),
+            if (controller.error != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Text(
+                  controller.error!,
+                  style: const TextStyle(color: Colors.red),
                 ),
               ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => _pickImage(ImageSource.camera),
-              child: const Text("Usar Câmera"),
+              onPressed: () async {
+                final picker = ImagePicker();
+
+                final pickedImage = await picker.pickImage(
+                  source: ImageSource.gallery,
+                );
+
+                if (pickedImage == null) return;
+
+                controller.scanAnimal(
+                  context,
+                  File(pickedImage.path),
+                );
+              },
+              child: const Text("Selecionar da Galeria"),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () => _pickImage(ImageSource.gallery),
-              child: const Text("Escolher da Galeria"),
+              onPressed: () async {
+                final picker = ImagePicker();
+
+                final pickedImage = await picker.pickImage(
+                  source: ImageSource.camera,
+                );
+
+                if (pickedImage == null) return;
+
+                controller.scanAnimal(
+                  context,
+                  File(pickedImage.path),
+                );
+              },
+              child: const Text("Tirar Foto"),
             ),
           ],
         ),
